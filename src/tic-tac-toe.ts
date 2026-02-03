@@ -35,34 +35,34 @@ export function makeMove(state: GameState, position: number): GameState {
 
   let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer };
 
-
-  
-  // Check position validity
-  if(position >= 0 && position <= 8) {
-
-      if(state.board[position] != null) {
-        throw new Error('Position is already occupied')
-  } else {
-    futureState.board[position] = state.currentPlayer;
-
-    // Update to next player
-    if (state.currentPlayer == "X") {
-      futureState.currentPlayer = "O";
-    } else {
-      futureState.currentPlayer = "X";
-    }
-    
-  }
-
-  } else {
-    
+  if(position < 0 || position > 8) {
     throw new Error('Position must be between 0 and 8')
   }
 
+  if(!Number.isInteger(position)) {
+    throw new Error('Position must be an integer')
+  }
 
+  if(state.board[position] != null) {
+    throw new Error('Position is already occupied')
+  }
+  
+  futureState.board[position] = state.currentPlayer;
+  
+  // Alternate to next player
+  if (state.currentPlayer == "X") {
+    futureState.currentPlayer = "O";
+  } else {
+    futureState.currentPlayer = "X";
+  }
+
+  //TO-DO: check for a winner. Three in a row.
+    
   return futureState;
 }
 
 export function getWinner(state: GameState): Player | null {
+
+  
   return null;
 }
