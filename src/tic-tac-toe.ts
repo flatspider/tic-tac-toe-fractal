@@ -16,6 +16,7 @@ export type GameState = {
   currentPlayer: Player;
 };
 
+//Looks good as initial function
 export function createGame(): GameState {
   return {
     board: [null, null, null, null, null, null, null, null, null],
@@ -23,8 +24,15 @@ export function createGame(): GameState {
   };
 }
 
+
 export function makeMove(state: GameState, position: number): GameState {
-  return state
+  // Need to modify the state of the game with the position
+  // state is currently a board. 0 1 2 3...as you would expect. 
+  // When I get a position number, I need to change that to the current player name
+  // Does this modify the state properly?
+  state.board[position] = state.currentPlayer;
+
+  return state;
 }
 
 export function getWinner(state: GameState): Player | null {
