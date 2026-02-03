@@ -63,6 +63,27 @@ export function makeMove(state: GameState, position: number): GameState {
 
 export function getWinner(state: GameState): Player | null {
 
+  let winArray = [
+    [0,1,2],[3,4,5],[6,7,8],[0,4,8],[3,4,6],[0,3,6],[1,4,7],[2,5,8]
+  ]
+
+  //Iterate through the 8 win states
+  for(let i = 0; i < winArray.length; i++) {
+      
+    //If all values are equal and not null, that's a win!
+    if(state.board[winArray[i][0]] != null && state.board[winArray[i][0]] == state.board[winArray[i][1]] && state.board[winArray[i][1]] == state.board[winArray[i][2]]) {
+      return state.board[winArray[i][0]];
+    } 
+
+  }
+
+    return null;
+
+  }
   
-  return null;
-}
+
+  
+
+
+
+ 
