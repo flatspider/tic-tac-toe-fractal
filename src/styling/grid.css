@@ -1,0 +1,37 @@
+.app {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  font-size: 3em;
+  place-items: center;
+  width: fit-content;
+}
+
+.container > div {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 3px solid black;
+  border-bottom: 3px solid black;
+}
+
+.container > div:nth-child(3n) {
+  border-right: none;
+}
+
+.container > div:nth-child(n + 7) {
+  border-bottom: none;
+}
+
+.update-text > div {
+  margin-top: 50px;
+}

@@ -1,33 +1,33 @@
 import { useState } from "react";
-import { createGame, makeMove } from "./tic-tac-toe";
+import { createGame, makeMove, getWinner } from "./tic-tac-toe";
+import "./styling/grid.css";
 
 function App() {
   let [gameState, setGameState] = useState(createGame());
 
-  // TODO: display the gameState, and call `makeMove` when a player clicks a button
-  // Not passing in the state properly. I need to pass in the return value...?
-  // You can map over the gamestate.board.
+  const winner = getWinner(gameState);
+
+  // TODO: Check for the winner and display a pop up
   return (
     <>
-      <div>Current player: {gameState.currentPlayer}</div>
-      <div
-        className="container"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto auto auto",
-          fontSize: "2em",
-        }}
-      >
-        {gameState.board.map((element, id) => (
-          <div
-            key={id}
-            onClick={() => {
-              setGameState(makeMove(gameState, id));
-            }}
-          >
-            {element ?? "_"}
-          </div>
-        ))}
+      <div className="app">
+        <div className="container">
+          {gameState.board.map((element, id) => (
+            <div
+              key={id}
+              onClick={() => {
+                setGameState(makeMove(gameState, id));
+              }}
+            >
+              {element ?? " "}
+            </div>
+          ))}
+        </div>
+        <div className="update-text">
+          <div>Current player: {gameState.currentPlayer}</div>
+
+          <div>{winner ? `${winner} has won the game!!` : "NO WINNER YET"}</div>
+        </div>
       </div>
     </>
   );
