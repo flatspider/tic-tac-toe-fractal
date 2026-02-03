@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { createGame, makeMove } from "./tic-tac-toe";
+import { createGame, makeMove, getWinner } from "./tic-tac-toe";
 
 function App() {
   let [gameState, setGameState] = useState(createGame());
 
-  // TODO: display the gameState, and call `makeMove` when a player clicks a button
-  // Not passing in the state properly. I need to pass in the return value...?
-  // You can map over the gamestate.board.
+  const winner = getWinner(gameState);
+
+  // TODO: Check for the winner and display a pop up
   return (
     <>
       <div>Current player: {gameState.currentPlayer}</div>
@@ -29,6 +29,8 @@ function App() {
           </div>
         ))}
       </div>
+
+      {winner ? `${winner} has won the game!!` : "NO WINNER YET"}
     </>
   );
 }
