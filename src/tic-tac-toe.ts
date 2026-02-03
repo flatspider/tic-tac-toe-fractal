@@ -48,6 +48,11 @@ export function makeMove(state: GameState, position: number): GameState {
   }
   
   futureState.board[position] = state.currentPlayer;
+
+  // Check if there is a winner, not if there is a null
+  if(getWinner(state) != null) {
+    throw new Error('Game is already over');
+  }
   
   // Alternate to next player
   if (state.currentPlayer == "X") {
@@ -55,18 +60,15 @@ export function makeMove(state: GameState, position: number): GameState {
   } else {
     futureState.currentPlayer = "X";
   }
-
-  //TO-DO: check for a winner. Three in a row.
     
   return futureState;
 }
 
 export function getWinner(state: GameState): Player | null {
-
+   
   let winArray = [
-    [0,1,2],[3,4,5],[6,7,8],[0,4,8],[3,4,6],[0,3,6],[1,4,7],[2,5,8]
+    [0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6],[0,3,6],[1,4,7],[2,5,8]
   ]
-
   //Iterate through the 8 win states
   for(let i = 0; i < winArray.length; i++) {
       
@@ -76,9 +78,7 @@ export function getWinner(state: GameState): Player | null {
     } 
 
   }
-
     return null;
-
   }
   
 
