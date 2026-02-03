@@ -1,3 +1,5 @@
+import type { expectTypeOf } from "vitest";
+
 export type Player = "X" | "O";
 
 export type Cell = Player | null;
@@ -27,12 +29,38 @@ export function createGame(): GameState {
 
 export function makeMove(state: GameState, position: number): GameState {
   // Need to modify the state of the game with the position
-  // state is currently a board. 0 1 2 3...as you would expect. 
-  // When I get a position number, I need to change that to the current player name
-  // Does this modify the state properly?
-  state.board[position] = state.currentPlayer;
+  // Check state of board position
+  // Probably need an intermediate state
+  // Check for winner
 
-  return state;
+  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer };
+
+
+  
+  // Check position validity
+  if(position >= 0 && position <= 8) {
+
+      if(state.board[position] != null) {
+        throw new Error('Position is already occupied')
+  } else {
+    futureState.board[position] = state.currentPlayer;
+
+    // Update to next player
+    if (state.currentPlayer == "X") {
+      futureState.currentPlayer = "O";
+    } else {
+      futureState.currentPlayer = "X";
+    }
+    
+  }
+
+  } else {
+    
+    throw new Error('Position must be between 0 and 8')
+  }
+
+
+  return futureState;
 }
 
 export function getWinner(state: GameState): Player | null {
