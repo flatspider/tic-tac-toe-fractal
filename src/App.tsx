@@ -24,9 +24,13 @@ function App() {
           ))}
         </div>
         <div className="update-text">
-          <div>Current player: {gameState.currentPlayer}</div>
+          <div className="current-player">
+            Current player: {gameState.currentPlayer}
+          </div>
 
-          <div>{winner ? `${winner} has won the game!!` : "NO WINNER YET"}</div>
+          <div className="winner-text">
+            {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
+          </div>
         </div>
       </div>
     </>
