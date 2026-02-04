@@ -33,11 +33,14 @@ function App() {
   );
 }
 
+// No longer necessary
+/*
 function getInitialGame() {
   let initialGameState = createGame();
   initialGameState = makeMove(initialGameState, 3);
   initialGameState = makeMove(initialGameState, 0);
   return initialGameState;
 }
+  */
 
 export default App;
