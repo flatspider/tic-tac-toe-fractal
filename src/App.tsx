@@ -1,13 +1,18 @@
 import { useState } from "react";
-import { createGame, makeMove, getWinner } from "./tic-tac-toe";
+import { createGame, makeMove, getWinner, checkDraw } from "./tic-tac-toe";
 import "./styling/grid.css";
 
 function App() {
   let [gameState, setGameState] = useState(createGame());
 
   const winner = getWinner(gameState);
+  const draw = checkDraw(gameState);
 
-  // TODO: Check for the winner and display a pop up
+  const handleClick = () => {
+    // Need to setGameState to empty
+    setGameState(createGame());
+  };
+
   return (
     <>
       <div className="app">
@@ -15,6 +20,7 @@ function App() {
           {gameState.board.map((element, id) => (
             <div
               key={id}
+              className={`${element}-symbol`}
               onClick={() => {
                 setGameState(makeMove(gameState, id));
               }}
@@ -30,6 +36,9 @@ function App() {
 
           <div className="winner-text">
             {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
+          </div>
+          <div>
+            {(winner || draw) && <button onClick={handleClick}>RESET</button>}
           </div>
         </div>
       </div>

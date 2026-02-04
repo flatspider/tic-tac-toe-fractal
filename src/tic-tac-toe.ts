@@ -81,6 +81,17 @@ export function getWinner(state: GameState): Player | null {
   }
     return null;
   }
+
+
+  export function checkDraw(state: GameState): Boolean {
+
+    if(!state.board.includes(null)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   
 
   
