@@ -35,6 +35,7 @@ export function makeMove(state: GameState, position: number): GameState {
 
   let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer };
 
+  console.log("Current game state", state);
 
   if(position < 0 || position > 8) {
     throw new Error('Position must be between 0 and 8')
