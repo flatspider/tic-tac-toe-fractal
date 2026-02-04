@@ -52,6 +52,12 @@ body {
   border-bottom: none;
 }
 
+.update-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* Puts space above the two text items */
 .update-text > div {
   margin-top: 50px;
@@ -59,10 +65,33 @@ body {
 
 /* Targets the winner response  */
 .winner-text {
-  font-size: 6em;
+  font-size: 4em;
 }
 
 /* Targets the current */
 .current-player {
   font-size: 5em;
+}
+
+button {
+  background-color: #6ded8a;
+  font-size: 6em;
+  box-shadow: 5px 5px 0px 2px rgba(0, 0, 0, 0.3);
+  font-family:
+    Pixelify Sans,
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+button:active {
+  background-color: #1645f5;
+  color: #6ded8a;
+  box-shadow: none;
+  font-size: 6em;
+  font-family:
+    Pixelify Sans,
+    Arial,
+    Helvetica,
+    sans-serif;
 }

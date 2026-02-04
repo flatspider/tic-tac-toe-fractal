@@ -7,6 +7,11 @@ function App() {
 
   const winner = getWinner(gameState);
 
+  const handleClick = () => {
+    // Need to setGameState to empty
+    setGameState(createGame());
+  };
+
   // TODO: Check for the winner and display a pop up
   return (
     <>
@@ -31,6 +36,7 @@ function App() {
           <div className="winner-text">
             {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
           </div>
+          <div>{winner && <button onClick={handleClick}>RESET</button>}</div>
         </div>
       </div>
     </>
