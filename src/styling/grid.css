@@ -1,3 +1,4 @@
+/* Sets all text to this font. Margin/padding set to zero so it matches viewport height of app */
 body {
   font-family:
     Pixelify Sans,
@@ -8,9 +9,8 @@ body {
   padding: 0;
 }
 
+/* Display flex and justify, align set to center. flex column puts the grid, lower text, stacked vertically */
 .app {
-  margin: 0;
-  padding: 0;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -19,14 +19,18 @@ body {
   background-color: #6ded8a;
 }
 
+/* Display in a grid. Three auto columns sorts the nine boxes.  */
+/* Place-items is shorthand for align-items and justify-items */
 .container {
   display: grid;
   grid-template-columns: auto auto auto;
-  font-size: 3em;
+  font-size: 5em;
   place-items: center;
-  width: fit-content;
 }
 
+/* This defines the grid boxes specifically */
+/* Display flex, justify content puts the x's in the middle of the cell */
+/* Align items organizes the text underneath */
 .container > div {
   width: 100px;
   height: 100px;
@@ -37,14 +41,27 @@ body {
   border-bottom: 3px solid black;
 }
 
+/* This selects the 3, 6, 9, div child and removes the border on the right. */
 .container > div:nth-child(3n) {
   border-right: none;
 }
 
+/* This selects 7, 8, 9 div childs and removes the bottom border */
 .container > div:nth-child(n + 7) {
   border-bottom: none;
 }
 
+/* Puts space above the two text items */
 .update-text > div {
   margin-top: 50px;
+}
+
+/* Targets the winner response  */
+.winner-text {
+  font-size: 6em;
+}
+
+/* Targets the current */
+.current-player {
+  font-size: 5em;
 }
