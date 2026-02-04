@@ -1,21 +1,51 @@
 import { useState, useEffect } from "react";
-import { createGame, makeMove, getWinner, checkDraw } from "./tic-tac-toe";
+//import { createGame, makeMove, getWinner, checkDraw } from "./tic-tac-toe";
 import "./styling/grid.css";
 
 function App() {
-  let [gameState, setGameState] = useState(createGame());
+  //let [gameState, setGameState] = useState(createGame());
 
+  // This is the server gameState
   const [data, setData] = useState(null); //Set this on the client side...?
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const winner = getWinner(gameState);
-  const draw = checkDraw(gameState);
+  const winner = false; //getWinner(gameState);
+  const draw = false; //checkDraw(gameState);
 
-  const handleClick = () => {
+  // I am using two gamestates on here....
+
+  const resetGameClick = () => {
     // Need to setGameState to empty
     // This will be a post to an endpoint
-    setGameState(createGame());
+    //setGameState(createGame());
+    // Let's construct the post request
+    const url: URL = new URL("http://localhost:3000/reset");
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: "",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to get game state`);
+        } else {
+          return response.json();
+        }
+      })
+      .then((json) => {
+        setData(json);
+        console.log("Reset game", json);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
   };
 
   const makeMoveToServer = (cellID) => {
@@ -93,14 +123,17 @@ function App() {
         )}
         <div className="update-text">
           <div className="current-player">
-            Current player: {gameState.currentPlayer}
+            Current player:{" "}
+            {loading ? <div>Loading...</div> : data?.currentPlayer}
           </div>
 
           <div className="winner-text">
             {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
           </div>
           <div>
-            {(winner || draw) && <button onClick={handleClick}>RESET</button>}
+            {(winner || draw) && (
+              <button onClick={resetGameClick}>RESET</button>
+            )}
           </div>
         </div>
       </div>

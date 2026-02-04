@@ -119,9 +119,17 @@ let position = req.body.position;
 
 console.log(req.body.position);
 
-let response = makeMove(currentGame, position);
-res.json(response);
+let newGameState = makeMove(currentGame, position);
+currentGame = newGameState;
+res.json(currentGame);
 
+});
+
+// Reset the game
+app.post("/reset", (req,res) => {
+    // update currentGame
+    currentGame = createGame();
+    res.json(currentGame);
 });
 
 app.get("/initialize", (req,res) => res.json(currentGame));
