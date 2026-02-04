@@ -1,4 +1,4 @@
-import type { expectTypeOf } from "vitest";
+//import type { expectTypeOf } from "vitest";
 
 export type Player = "X" | "O";
 
