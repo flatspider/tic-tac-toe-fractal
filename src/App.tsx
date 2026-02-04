@@ -10,18 +10,14 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const winner = false; //getWinner(gameState);
-  const draw = false; //checkDraw(gameState);
+  const [winner, setWinner] = useState(false);
+  const [draw, setDraw] = useState(false);
 
-  // I am using two gamestates on here....
+  //const winner = false; //getWinner(gameState);
+  //const draw = false; //checkDraw(gameState);
 
   const resetGameClick = () => {
-    // Need to setGameState to empty
-    // This will be a post to an endpoint
-    //setGameState(createGame());
-    // Let's construct the post request
     const url: URL = new URL("http://localhost:3000/reset");
-
     fetch(url, {
       method: "POST",
       headers: {
@@ -71,8 +67,11 @@ function App() {
         }
       })
       .then((json) => {
-        setData(json);
+        setData(json.currentGame);
         console.log("Move made", json);
+        setWinner(json.winner);
+        setDraw(json.draw);
+        // Added to look for winner or draw
         setLoading(false);
       })
       .catch((err) => {
@@ -91,7 +90,7 @@ function App() {
         }
       })
       .then((json) => {
-        setData(json);
+        setData(json.currentGame);
         console.log(json);
         setLoading(false);
       })

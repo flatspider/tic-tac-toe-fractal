@@ -18,6 +18,8 @@ export type GameState = {
   currentPlayer: Player;
 };
 
+/*
+
 //Looks good as initial function
 export function createGame(): GameState {
   return {

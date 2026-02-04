@@ -100,29 +100,16 @@ export function makeMove(state: GameState, position: number): GameState {
   return futureState;
 }
 
-// When the server starts, create the game?
-// This is turning it into a string...?
 let currentGame: GameState = createGame();
 
-// The endpoints will exist here. Think of the inputs. 
 
-// Where is the gamestate living?
-
-// Input on REQUEST: only the position
-// Output RESPONSE is going to be the new gamestate.
+// Move, post endpoint. IN: Cell ID. OUT: Current game state
 app.post("/move", (req,res) => {
-
-//req.position = cellID
-// update currentGame
-
-let position = req.body.position;
-
-console.log(req.body.position);
-
-let newGameState = makeMove(currentGame, position);
-currentGame = newGameState;
-res.json(currentGame);
-
+    let position = req.body.position;
+    let newGameState = makeMove(currentGame, position);
+    currentGame = newGameState;
+    let response = {currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }
+    res.json(response);
 });
 
 // Reset the game
@@ -132,8 +119,6 @@ app.post("/reset", (req,res) => {
     res.json(currentGame);
 });
 
-app.get("/initialize", (req,res) => res.json(currentGame));
-
-
+app.get("/initialize", (req,res) => res.json({currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }));
 
 ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"))
