@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { createGame, makeMove, getWinner } from "./tic-tac-toe";
+import { createGame, makeMove, getWinner, checkDraw } from "./tic-tac-toe";
 import "./styling/grid.css";
 
 function App() {
   let [gameState, setGameState] = useState(createGame());
 
   const winner = getWinner(gameState);
+  const draw = checkDraw(gameState);
 
   const handleClick = () => {
     // Need to setGameState to empty
@@ -36,7 +37,9 @@ function App() {
           <div className="winner-text">
             {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
           </div>
-          <div>{winner && <button onClick={handleClick}>RESET</button>}</div>
+          <div>
+            {(winner || draw) && <button onClick={handleClick}>RESET</button>}
+          </div>
         </div>
       </div>
     </>
