@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-//import { createGame, makeMove, getWinner, checkDraw } from "./tic-tac-toe";
+import { type GameState } from "./tic-tac-toe";
 import "./styling/grid.css";
 
 function App() {
   //let [gameState, setGameState] = useState(createGame());
 
   // This is the server gameState
-  const [data, setData] = useState(null); //Set this on the client side...?
+  const [data, setData] = useState<null | GameState>(null); //Set this on the client side...?
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [_error, setError] = useState(null);
 
   const [winner, setWinner] = useState(false);
   const [draw, setDraw] = useState(false);
@@ -44,7 +44,7 @@ function App() {
       });
   };
 
-  const makeMoveToServer = (cellID) => {
+  const makeMoveToServer = (cellID: number) => {
     // Hit move endpoint with position
     console.log(cellID);
 
@@ -107,7 +107,7 @@ function App() {
           <div>Loading...</div>
         ) : (
           <div className="container">
-            {data?.board.map((element, id) => (
+            {data?.board.map((element: String, id: number) => (
               <div
                 key={id}
                 className={`${element}-symbol`}
