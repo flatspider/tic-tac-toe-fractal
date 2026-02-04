@@ -18,6 +18,39 @@ function App() {
     setGameState(createGame());
   };
 
+  const makeMoveToServer = (cellID) => {
+    // Hit move endpoint with position
+    console.log(cellID);
+
+    // Let's construct the post request
+    const url: URL = new URL("http://localhost:3000/move");
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ position: cellID }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to get game state`);
+        } else {
+          return response.json();
+        }
+      })
+      .then((json) => {
+        setData(json);
+        console.log("Move made", json);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     fetch("http://localhost:3000/initialize")
       .then((response) => {
@@ -50,7 +83,7 @@ function App() {
                 key={id}
                 className={`${element}-symbol`}
                 onClick={() => {
-                  setGameState(makeMove(gameState, id));
+                  makeMoveToServer(id);
                 }}
               >
                 {element ?? " "}

@@ -35,6 +35,71 @@ export function createGame(): GameState {
   };
 }
 
+export function getWinner(state: GameState): Player | null {
+   
+  let winArray = [
+    [0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6],[0,3,6],[1,4,7],[2,5,8]
+  ]
+  //Iterate through the 8 win states
+  for(let i = 0; i < winArray.length; i++) {
+      
+    //If all values are equal and not null, that's a win!
+    if(state.board[winArray[i][0]] != null && state.board[winArray[i][0]] == state.board[winArray[i][1]] && state.board[winArray[i][1]] == state.board[winArray[i][2]]) {
+      return state.board[winArray[i][0]];
+    } 
+
+  }
+    return null;
+  }
+
+export function checkDraw(state: GameState): Boolean {
+
+    if(!state.board.includes(null)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+export function makeMove(state: GameState, position: number): GameState {
+  // Need to modify the state of the game with the position
+  // Check state of board position
+  // Probably need an intermediate state
+  // Check for winner
+
+  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer };
+
+  console.log("Current game state", state);
+
+  if(position < 0 || position > 8) {
+    throw new Error('Position must be between 0 and 8')
+  }
+
+  if(!Number.isInteger(position)) {
+    throw new Error('Position must be an integer')
+  }
+
+  if(state.board[position] != null) {
+    throw new Error('Position is already occupied')
+  }
+  
+  futureState.board[position] = state.currentPlayer;
+
+  // Check if there is a winner, not if there is a null
+  if(getWinner(state) != null) {
+    throw new Error('Game is already over');
+  }
+  
+  // Alternate to next player
+  if (state.currentPlayer == "X") {
+    futureState.currentPlayer = "O";
+  } else {
+    futureState.currentPlayer = "X";
+  }
+    
+  return futureState;
+}
+
 // When the server starts, create the game?
 // This is turning it into a string...?
 let currentGame: GameState = createGame();
@@ -45,7 +110,19 @@ let currentGame: GameState = createGame();
 
 // Input on REQUEST: only the position
 // Output RESPONSE is going to be the new gamestate.
-app.post("/move", (req,res) => res.json(currentGame));
+app.post("/move", (req,res) => {
+
+//req.position = cellID
+// update currentGame
+
+let position = req.body.position;
+
+console.log(req.body.position);
+
+let response = makeMove(currentGame, position);
+res.json(response);
+
+});
 
 app.get("/initialize", (req,res) => res.json(currentGame));
 
