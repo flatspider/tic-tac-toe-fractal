@@ -52,6 +52,7 @@ body {
   border-bottom: none;
 }
 
+/* Being used as a group. Need to rename class */
 .update-text {
   display: flex;
   flex-direction: column;
@@ -73,6 +74,7 @@ body {
   font-size: 5em;
 }
 
+/* Button changing based on click */
 button {
   background-color: #6ded8a;
   font-size: 6em;
@@ -84,14 +86,19 @@ button {
     sans-serif;
 }
 
+/* Color palette from https://www.color-hex.com/color-palette/109374 */
+
 button:active {
   background-color: #1645f5;
   color: #6ded8a;
   box-shadow: none;
-  font-size: 6em;
-  font-family:
-    Pixelify Sans,
-    Arial,
-    Helvetica,
-    sans-serif;
+}
+
+/* Targets the generated class on each cell symbol */
+.X-symbol {
+  color: #f0f14e;
+}
+
+.O-symbol {
+  color: #1645f5;
 }

@@ -13,7 +13,6 @@ function App() {
     setGameState(createGame());
   };
 
-  // TODO: Check for the winner and display a pop up
   return (
     <>
       <div className="app">
@@ -21,6 +20,7 @@ function App() {
           {gameState.board.map((element, id) => (
             <div
               key={id}
+              className={`${element}-symbol`}
               onClick={() => {
                 setGameState(makeMove(gameState, id));
               }}
