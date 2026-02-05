@@ -81,7 +81,7 @@ function App() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:3000/initialize")
+    fetch("http://localhost:3000/game")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch`);
