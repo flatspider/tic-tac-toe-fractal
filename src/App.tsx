@@ -3,8 +3,6 @@ import { type Cell, type GameState } from "./tic-tac-toe";
 import "./styling/grid.css";
 
 function App() {
-  //let [gameState, setGameState] = useState(createGame());
-
   // This is the server gameState
   const [gameState, setGameState] = useState<null | GameState>(null); //Set this on the client side...?
   const [loading, setLoading] = useState(true);
@@ -26,7 +24,7 @@ function App() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: "",
+      body: JSON.stringify({ gameID: currentGameID }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -36,7 +34,7 @@ function App() {
         }
       })
       .then((json) => {
-        setGameState(json);
+        setGameState(json.gameState);
         setLoading(false);
       })
       .catch((err) => {
@@ -57,7 +55,7 @@ function App() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ position: cellID }),
+      body: JSON.stringify({ position: cellID, gameID: currentGameID }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -67,9 +65,11 @@ function App() {
         }
       })
       .then((json) => {
-        setGameState(json.currentGame);
+        setGameState(json.gameState);
         setWinner(json.winner);
         setDraw(json.draw);
+        // Not sure if necessary to set the gameID every move.
+        setCurrentGameID(json.gameID);
         // Added to look for winner or draw
         setLoading(false);
       })
@@ -79,6 +79,7 @@ function App() {
       });
   };
 
+  // I don't think useEffect is right. This will be hooked to a button.
   useEffect(() => {
     fetch("http://localhost:3000/create", {
       method: "POST",

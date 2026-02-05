@@ -140,7 +140,7 @@ app.post("/move", (req,res) => {
     
 });
 
-// Reset the game. TO-DO: Which game? Going to need to input gameID
+// Reset the game. 
 app.post("/reset", (req,res) => {
     // update currentGame
     let targetGameID = req.body.gameID;
