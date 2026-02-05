@@ -4,7 +4,7 @@ import ViteExpress from "vite-express";
 
 const PORT = 3000;
 
-const app = express();
+export const app = express();
 
 // No cors needed when all requests are coming from the same port
 //app.use(cors());
@@ -28,6 +28,8 @@ export type GameState = {
   currentPlayer: Player;
   gameID: Number;
 };
+
+export type GameList = Map<string, GameState>;
 
 export function createGame(): GameState {
   return {
@@ -128,4 +130,6 @@ app.get("/games",(_req,res)=>{
   return res.json({games: "List of games"})
 });
 
-ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"))
+ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"));
+
+export default app;
