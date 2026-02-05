@@ -113,12 +113,12 @@ app.post("/move", (req,res) => {
 });
 
 // Reset the game
-app.post("/reset", (req,res) => {
+app.post("/reset", (_req,res) => {
     // update currentGame
     currentGame = createGame();
     res.json(currentGame);
 });
 
-app.get("/initialize", (req,res) => res.json({currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }));
+app.get("/initialize", (_req,res) => res.json({currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }));
 
 ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"))

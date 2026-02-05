@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { type GameState } from "./tic-tac-toe";
+import { type Cell, type GameState } from "./tic-tac-toe";
 import "./styling/grid.css";
 
 function App() {
@@ -107,7 +107,7 @@ function App() {
           <div>Loading...</div>
         ) : (
           <div className="container">
-            {data?.board.map((element: String, id: number) => (
+            {data?.board.map((element: string | Cell, id: number) => (
               <div
                 key={id}
                 className={`${element}-symbol`}
