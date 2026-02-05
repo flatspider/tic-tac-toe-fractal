@@ -13,6 +13,8 @@ function App() {
   const [winner, setWinner] = useState(false);
   const [draw, setDraw] = useState(false);
 
+  const [currentGameID, setCurrentGameID] = useState<string>("");
+
   //const winner = false; //getWinner(gameState);
   //const draw = false; //checkDraw(gameState);
 
@@ -78,7 +80,14 @@ function App() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:3000/game")
+    fetch("http://localhost:3000/create", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: "",
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch`);
@@ -87,7 +96,9 @@ function App() {
         }
       })
       .then((json) => {
-        setGameState(json.currentGame);
+        console.log(json);
+        setGameState(json.gameState);
+        setCurrentGameID(json.gameID);
         setLoading(false);
       })
       .catch((err) => {

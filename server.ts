@@ -117,7 +117,7 @@ app.post("/create", (_req,res) => {
     gameState: newGame,
     gameID: newGameID,
   }
-
+  
   res.status(201).json(response);
 
 });
