@@ -1,3 +1,4 @@
+import type { UUID } from "crypto";
 import express from "express";
 import ViteExpress from "vite-express";
 //import cors from "cors";
@@ -23,22 +24,26 @@ export type Cell = Player | null;
 //  6 | 7 | 8
 export type Board = [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 
+
+// Does the gameID have to live on the game state?
 export type GameState = {
   board: Board;
   currentPlayer: Player;
-  gameID: Number;
 };
 
 export type GameList = Map<string, GameState>;
 
+let gameCollection: GameList = new Map();
+
+//Creating a game with a random ID
 export function createGame(): GameState {
   return {
     board: [null, null, null, null, null, null, null, null, null],
     currentPlayer: "X",
-    gameID: 1,
   };
 }
 
+// Does this need to have an ID attached to it? I feel like no. Not how it should be used. 
 export function getWinner(state: GameState): Player | null {
    
   let winArray = [
@@ -101,33 +106,76 @@ export function makeMove(state: GameState, position: number): GameState {
   return futureState;
 }
 
+app.post("/create", (_req,res) => {
+  // Create an initial blank game
+  // Does this need to be added to our list of games? Yes.
+  let newGame: GameState = createGame();
+  let newGameID = crypto.randomUUID();
+  gameCollection.set(newGameID,newGame);
 
-// Create an initial blank game
-let currentGame: GameState = createGame();
+  let response = {
+    gameState: newGame,
+    gameID: newGameID,
+  }
+
+  res.status(201).json(response);
+
+});
 
 // Move, post endpoint. IN: Cell ID. OUT: Current game state
+// Maybe ID should be in query params
 app.post("/move", (req,res) => {
     let position = req.body.position;
-    let newGameState = makeMove(currentGame, position);
-    // Update the singular game.
-    // TO-DO: Will need to also put in gameID. Update the game at gameID 3...
-    currentGame = newGameState;
-    let response = {currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }
-    res.json(response);
+    let gameID = req.body.gameID;
+    let targetGame = gameCollection.get(gameID);
+
+    if(targetGame != null) {
+      let newGameState = makeMove(targetGame, position);
+      gameCollection.set(gameID,newGameState);
+      let response = {gameState: newGameState, winner: getWinner(newGameState), draw: checkDraw(newGameState), gameID: gameID}
+      res.status(200).json(response);
+    } else {
+      res.status(404).json({error: "Game not found"});
+    }
+    
 });
 
 // Reset the game. TO-DO: Which game? Going to need to input gameID
-app.post("/reset", (_req,res) => {
+app.post("/reset", (req,res) => {
     // update currentGame
-    currentGame = createGame();
-    res.json(currentGame);
+    let targetGameID = req.body.gameID;
+    //let targetGame = gameCollection.get(targetGameID);
+    let resetGame = createGame();
+    // This could be null. Need to check for valid ID
+    if(gameCollection.has(targetGameID)){
+      gameCollection.set(targetGameID, resetGame)
+      res.status(200).json({gameID: targetGameID, gameState: resetGame});
+    } else {
+      res.status(404).send();
+    }
 });
 
-// TO-DO: Get which game? Will need gameID.
-app.get("/game", (_req,res) => res.json({currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }));
+// TO-DO: Get which game? Will need gameID to be input.
+// Input: just the UUID. Then look it up in the map
+app.get("/game/:ID", (req,res) => {
+  // take in the req.body
+  let targetID = req.params.ID;
+  let targetGame = gameCollection.get(targetID);
+
+  if(targetGame != null) {
+    // Do I not need to send back the ID?
+    res.json({gameState: targetGame, winner: getWinner(targetGame), draw: checkDraw(targetGame), gameID: targetID});
+  } else {
+    res.status(400).json({error: "No game found"});
+  }
+
+}) 
 
 app.get("/games",(_req,res)=>{
-  return res.json({games: "List of games"})
+  let games = gameCollection.keys();
+  let gamesArray = Array.from(games);
+  // Return the list of keys for the map
+  res.json(gamesArray);
 });
 
 ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"));

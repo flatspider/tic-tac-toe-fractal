@@ -1,5 +1,7 @@
 //import type { expectTypeOf } from "vitest";
 
+import type { UUID } from "crypto";
+
 export type Player = "X" | "O";
 
 export type Cell = Player | null;
@@ -16,7 +18,7 @@ export type Board = [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 export type GameState = {
   board: Board;
   currentPlayer: Player;
-  gameID: Number;
+  gameID: UUID;
 };
 
 /*

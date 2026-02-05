@@ -24,10 +24,6 @@ describe("createGame", () => {
     expect(game.currentPlayer).toBe("X");
   });
 
-  it("has an initial gameID set", () => {
-    const game = createGame();
-    expect(game.gameID).toBe(1);
-  });
 
 });
 
