@@ -1,3 +1,4 @@
+import type { UUID } from "crypto";
 import express from "express";
 import ViteExpress from "vite-express";
 //import cors from "cors";
@@ -23,22 +24,28 @@ export type Cell = Player | null;
 //  6 | 7 | 8
 export type Board = [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 
+
+// Does the gameID have to live on the game state?
 export type GameState = {
   board: Board;
   currentPlayer: Player;
-  gameID: Number;
+  gameID: UUID;
 };
 
-export type GameList = Map<string, GameState>;
+export type GameList = Map<UUID, GameState>;
 
+let gameCollection: GameList = new Map();
+
+//Creating a game with a random ID
 export function createGame(): GameState {
   return {
     board: [null, null, null, null, null, null, null, null, null],
     currentPlayer: "X",
-    gameID: 1,
+    gameID: crypto.randomUUID(),
   };
 }
 
+// Does this need to have an ID attached to it? I feel like no. Not how it should be used. 
 export function getWinner(state: GameState): Player | null {
    
   let winArray = [
@@ -102,8 +109,14 @@ export function makeMove(state: GameState, position: number): GameState {
 }
 
 
-// Create an initial blank game
-let currentGame: GameState = createGame();
+app.post("/create", (_req,res) => {
+  // Create an initial blank game
+  // Does this need to be added to our list of games? Yes.
+  let newGame: GameState = createGame();
+  gameCollection.set(newGame.gameID,newGame);
+  res.status(201).json(newGame);
+
+});
 
 // Move, post endpoint. IN: Cell ID. OUT: Current game state
 app.post("/move", (req,res) => {
