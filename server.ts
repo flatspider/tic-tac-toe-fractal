@@ -1,17 +1,17 @@
 import express from "express";
 import ViteExpress from "vite-express";
-import cors from "cors";
+//import cors from "cors";
 
 const PORT = 3000;
 
-const app = express();
+export const app = express();
 
-app.use(cors());
+// No cors needed when all requests are coming from the same port
+//app.use(cors());
+
 app.use(express.json());
 
-
 export type Player = "X" | "O";
-
 export type Cell = Player | null;
 
 // Board is a 3x3 grid, represented as a 9-element array.
@@ -26,12 +26,16 @@ export type Board = [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 export type GameState = {
   board: Board;
   currentPlayer: Player;
+  gameID: Number;
 };
+
+export type GameList = Map<string, GameState>;
 
 export function createGame(): GameState {
   return {
     board: [null, null, null, null, null, null, null, null, null],
     currentPlayer: "X",
+    gameID: 1,
   };
 }
 
@@ -61,15 +65,11 @@ export function checkDraw(state: GameState): Boolean {
     }
   }
 
+// I think there will need to be a new input argument for game ID.
 export function makeMove(state: GameState, position: number): GameState {
-  // Need to modify the state of the game with the position
-  // Check state of board position
-  // Probably need an intermediate state
-  // Check for winner
-
-  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer };
-
-  //console.log("Current game state", state);
+  
+  // Create copy of state to directly modify
+  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer, gameID: state.gameID };
 
   if(position < 0 || position > 8) {
     throw new Error('Position must be between 0 and 8')
@@ -83,9 +83,10 @@ export function makeMove(state: GameState, position: number): GameState {
     throw new Error('Position is already occupied')
   }
   
+  // This writes the X or O to the board array. 
   futureState.board[position] = state.currentPlayer;
 
-  // Check if there is a winner, not if there is a null
+  // Check if there is a winner. Maybe check for draw after this?
   if(getWinner(state) != null) {
     throw new Error('Game is already over');
   }
@@ -96,29 +97,39 @@ export function makeMove(state: GameState, position: number): GameState {
   } else {
     futureState.currentPlayer = "X";
   }
-    
+ 
   return futureState;
 }
 
-let currentGame: GameState = createGame();
 
+// Create an initial blank game
+let currentGame: GameState = createGame();
 
 // Move, post endpoint. IN: Cell ID. OUT: Current game state
 app.post("/move", (req,res) => {
     let position = req.body.position;
     let newGameState = makeMove(currentGame, position);
+    // Update the singular game.
+    // TO-DO: Will need to also put in gameID. Update the game at gameID 3...
     currentGame = newGameState;
     let response = {currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }
     res.json(response);
 });
 
-// Reset the game
+// Reset the game. TO-DO: Which game? Going to need to input gameID
 app.post("/reset", (_req,res) => {
     // update currentGame
     currentGame = createGame();
     res.json(currentGame);
 });
 
+// TO-DO: Get which game? Will need gameID.
 app.get("/game", (_req,res) => res.json({currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }));
 
-ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"))
+app.get("/games",(_req,res)=>{
+  return res.json({games: "List of games"})
+});
+
+ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"));
+
+export default app;

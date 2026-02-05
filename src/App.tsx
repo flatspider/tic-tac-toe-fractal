@@ -6,7 +6,7 @@ function App() {
   //let [gameState, setGameState] = useState(createGame());
 
   // This is the server gameState
-  const [data, setData] = useState<null | GameState>(null); //Set this on the client side...?
+  const [gameState, setGameState] = useState<null | GameState>(null); //Set this on the client side...?
   const [loading, setLoading] = useState(true);
   const [_error, setError] = useState(null);
 
@@ -34,7 +34,7 @@ function App() {
         }
       })
       .then((json) => {
-        setData(json);
+        setGameState(json);
         setLoading(false);
       })
       .catch((err) => {
@@ -65,7 +65,7 @@ function App() {
         }
       })
       .then((json) => {
-        setData(json.currentGame);
+        setGameState(json.currentGame);
         setWinner(json.winner);
         setDraw(json.draw);
         // Added to look for winner or draw
@@ -87,7 +87,7 @@ function App() {
         }
       })
       .then((json) => {
-        setData(json.currentGame);
+        setGameState(json.currentGame);
         setLoading(false);
       })
       .catch((err) => {
@@ -103,7 +103,7 @@ function App() {
           <div>Loading...</div>
         ) : (
           <div className="container">
-            {data?.board.map((element: string | Cell, id: number) => (
+            {gameState?.board.map((element: string | Cell, id: number) => (
               <div
                 key={id}
                 className={`${element}-symbol`}
@@ -119,7 +119,7 @@ function App() {
         <div className="update-text">
           <div className="current-player">
             Current player:{" "}
-            {loading ? <div>Loading...</div> : data?.currentPlayer}
+            {loading ? <div>Loading...</div> : gameState?.currentPlayer}
           </div>
 
           <div className="winner-text">
