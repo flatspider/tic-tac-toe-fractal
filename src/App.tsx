@@ -113,25 +113,19 @@ function App() {
   return (
     <>
       <div className="app">
-        <Lobby />
-        <TicTacToeBoard />
-        {loading ? (
-          <div>Loading...</div>
-        ) : (
-          <div className="container">
-            {gameState?.board.map((element: string | Cell, id: number) => (
-              <div
-                key={id}
-                className={`${element}-symbol`}
-                onClick={() => {
-                  makeMoveToServer(id);
-                }}
-              >
-                {element ?? " "}
-              </div>
-            ))}
-          </div>
-        )}
+        <div>
+          {loading ? (
+            <div>Loading...</div>
+          ) : gameState ? (
+            <TicTacToeBoard
+              gameState={gameState}
+              makeMoveToServer={makeMoveToServer}
+            />
+          ) : (
+            <div>Not there</div>
+          )}
+        </div>
+
         <div className="update-text">
           <div className="current-player">
             Current player:{" "}
