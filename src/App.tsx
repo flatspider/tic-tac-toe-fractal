@@ -15,6 +15,8 @@ function App() {
 
   const [currentGameID, setCurrentGameID] = useState<string>("");
 
+  const [currentView, setCurrentView] = useState<string>("lobby");
+
   //const winner = false; //getWinner(gameState);
   //const draw = false; //checkDraw(gameState);
 
@@ -81,7 +83,36 @@ function App() {
       });
   };
 
-  // I don't think useEffect is right. This will be hooked to a button.
+  const goToNewGame = () => {
+    fetch("http://localhost:3000/create", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: "",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch`);
+        } else {
+          return response.json();
+        }
+      })
+      .then((json) => {
+        console.log(json);
+        setGameState(json.gameState);
+        setCurrentGameID(json.gameID);
+        setCurrentView("game-view");
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
+  };
+
+  /*
   useEffect(() => {
     fetch("http://localhost:3000/create", {
       method: "POST",
@@ -109,38 +140,40 @@ function App() {
         setLoading(false);
       });
   }, []);
+  */
 
   return (
     <>
       <div className="app">
-        <div>
-          {loading ? (
-            <div>Loading...</div>
-          ) : gameState ? (
-            <TicTacToeBoard
-              gameState={gameState}
-              makeMoveToServer={makeMoveToServer}
-            />
-          ) : (
-            <div>Not there</div>
-          )}
-        </div>
-
-        <div className="update-text">
-          <div className="current-player">
-            Current player:{" "}
-            {loading ? <div>Loading...</div> : gameState?.currentPlayer}
+        {currentView === "lobby" && <Lobby />}
+        {currentView === "game-view" && (
+          <div className="game-play">
+            <div>
+              {loading && <div>Loading...</div>}
+              {!loading && !gameState && <div>Not there</div>}
+              {!loading && gameState && (
+                <TicTacToeBoard
+                  gameState={gameState}
+                  makeMoveToServer={makeMoveToServer}
+                />
+              )}
+            </div>
+            <div className="update-text">
+              <div className="current-player">
+                Current player:{" "}
+                {loading ? <div>Loading...</div> : gameState?.currentPlayer}
+              </div>
+              <div className="winner-text">
+                {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
+              </div>
+              <div>
+                {(winner || draw) && (
+                  <button onClick={resetGameClick}>RESET</button>
+                )}
+              </div>
+            </div>
           </div>
-
-          <div className="winner-text">
-            {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
-          </div>
-          <div>
-            {(winner || draw) && (
-              <button onClick={resetGameClick}>RESET</button>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </>
   );
