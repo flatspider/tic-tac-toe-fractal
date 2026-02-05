@@ -103,23 +103,25 @@ export function makeMove(state: GameState, position: number): GameState {
 // Create an initial blank game
 let currentGame: GameState = createGame();
 
-
 // Move, post endpoint. IN: Cell ID. OUT: Current game state
 app.post("/move", (req,res) => {
     let position = req.body.position;
     let newGameState = makeMove(currentGame, position);
+    // Update the singular game.
+    // TO-DO: Will need to also put in gameID. Update the game at gameID 3...
     currentGame = newGameState;
     let response = {currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }
     res.json(response);
 });
 
-// Reset the game
+// Reset the game. TO-DO: Which game? Going to need to input gameID
 app.post("/reset", (_req,res) => {
     // update currentGame
     currentGame = createGame();
     res.json(currentGame);
 });
 
+// TO-DO: Get which game? Will need gameID.
 app.get("/game", (_req,res) => res.json({currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }));
 
 app.get("/games",(_req,res)=>{
