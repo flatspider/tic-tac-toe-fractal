@@ -35,7 +35,6 @@ function App() {
       })
       .then((json) => {
         setData(json);
-        console.log("Reset game", json);
         setLoading(false);
       })
       .catch((err) => {
@@ -46,7 +45,6 @@ function App() {
 
   const makeMoveToServer = (cellID: number) => {
     // Hit move endpoint with position
-    console.log(cellID);
 
     // Let's construct the post request
     const url: URL = new URL("http://localhost:3000/move");
@@ -68,7 +66,6 @@ function App() {
       })
       .then((json) => {
         setData(json.currentGame);
-        console.log("Move made", json);
         setWinner(json.winner);
         setDraw(json.draw);
         // Added to look for winner or draw
@@ -91,7 +88,6 @@ function App() {
       })
       .then((json) => {
         setData(json.currentGame);
-        console.log(json);
         setLoading(false);
       })
       .catch((err) => {
