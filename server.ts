@@ -1,17 +1,17 @@
 import express from "express";
 import ViteExpress from "vite-express";
-import cors from "cors";
+//import cors from "cors";
 
 const PORT = 3000;
 
 const app = express();
 
-app.use(cors());
+// No cors needed when all requests are coming from the same port
+//app.use(cors());
+
 app.use(express.json());
 
-
 export type Player = "X" | "O";
-
 export type Cell = Player | null;
 
 // Board is a 3x3 grid, represented as a 9-element array.
@@ -26,12 +26,14 @@ export type Board = [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell];
 export type GameState = {
   board: Board;
   currentPlayer: Player;
+  gameID: Number;
 };
 
 export function createGame(): GameState {
   return {
     board: [null, null, null, null, null, null, null, null, null],
     currentPlayer: "X",
+    gameID: 1,
   };
 }
 
@@ -67,7 +69,7 @@ export function makeMove(state: GameState, position: number): GameState {
   // Probably need an intermediate state
   // Check for winner
 
-  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer };
+  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer, gameID: state.gameID };
 
   //console.log("Current game state", state);
 
