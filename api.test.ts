@@ -12,10 +12,10 @@ describe("POST to /create game", ()=>{
         .post("/create")
         .send({}).expect(201).expect("Content-Type", /json/);
 
-        const game = res.body as GameState;
+        const game = res.body;
         expect(game).toHaveProperty("gameID");
 
-        expect(game.board).toEqual([null, null, null, null, null, null, null, null, null]);
+        expect(game.gameState.board).toEqual([null, null, null, null, null, null, null, null, null]);
     })
 });
 
@@ -23,14 +23,13 @@ describe("GET to /games for list", ()=>{
     it("Return a list of games", async () => {
 
         await request(app).post("/create").send({}).expect(201);
-
         const res = await request(app)
         .get("/games")
         .send({}).expect(200).expect("Content-Type", /json/);
 
-        // There should be one game
-        const games = res.body as Array<String>;
-        expect(games.length).toBeGreaterThanOrEqual(1);
+        // There should be at least one game
+        const gameList = res.body as Array<String>;
+        expect(gameList.length).toBeGreaterThanOrEqual(1);
 
     })
 });
@@ -40,23 +39,24 @@ describe("GET to /game/:ID", ()=>{
         // Creating a new game within the test
         const newGameResponse = await request(app).post("/create").send({}).expect(201);
         // Pulling the gameID off the response
-        const {gameID} = newGameResponse.body as GameState;
+        const targetGameID = newGameResponse.body.gameID;
 
         const res = await request(app)
-        .get(`/game/${gameID}`)
+        .get(`/game/${targetGameID}`)
         .send({}).expect(200).expect("Content-Type", /json/);
 
         // Check there is a GameState coming back from the specific ID endpoint
-        const game = res.body as GameState;
-        expect(game).toHaveProperty("gameID", gameID);
-        expect(game).toHaveProperty("board");
+        const game = res.body;
+        expect(game).toHaveProperty("gameState");
+        expect(game).toHaveProperty("gameID", targetGameID);
     })
 });
 
 describe("POST to /move", () => {
   it("Accept a valid move and return updated game state", async () => {
     const newCreatedGame = await request(app).post("/create").send({}).expect(201);
-    const { gameID } = newCreatedGame.body as GameState;
+    let gameID = newCreatedGame.body.gameID;
+    
 
     const res = await request(app)
       .post("/move")
@@ -64,7 +64,7 @@ describe("POST to /move", () => {
       .expect(200)
       .expect("Content-Type", /json/);
 
-    const game = res.body as GameState;
+    const game = res.body.gameState as GameState;
     expect(game).toHaveProperty("board");
     expect(game).toHaveProperty("currentPlayer");
   });
@@ -80,7 +80,7 @@ describe("POST to /move", () => {
 describe("POST to /reset", () => {
   it("Reset a game and return the fresh game state", async () => {
     const newCreatedGame = await request(app).post("/create").send({}).expect(201);
-    const { gameID } = newCreatedGame.body as GameState;
+    const { gameID } = newCreatedGame.body;
 
     const res = await request(app)
       .post("/reset")
@@ -88,10 +88,10 @@ describe("POST to /reset", () => {
       .expect(200)
       .expect("Content-Type", /json/);
 
-    const game = res.body as GameState;
+    const game = res.body;
     expect(game).toHaveProperty("gameID", gameID);
-    expect(game).toHaveProperty("board");
-    expect(game).toHaveProperty("currentPlayer");
+    expect(game.gameState).toHaveProperty("board");
+    expect(game.gameState).toHaveProperty("currentPlayer");
   });
 
   it("Return 404 for a non-existent game", async () => {
