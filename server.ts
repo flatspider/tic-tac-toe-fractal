@@ -63,15 +63,11 @@ export function checkDraw(state: GameState): Boolean {
     }
   }
 
+// I think there will need to be a new input argument for game ID.
 export function makeMove(state: GameState, position: number): GameState {
-  // Need to modify the state of the game with the position
-  // Check state of board position
-  // Probably need an intermediate state
-  // Check for winner
-
+  
+  // Create copy of state to directly modify
   let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer, gameID: state.gameID };
-
-  //console.log("Current game state", state);
 
   if(position < 0 || position > 8) {
     throw new Error('Position must be between 0 and 8')
@@ -85,9 +81,10 @@ export function makeMove(state: GameState, position: number): GameState {
     throw new Error('Position is already occupied')
   }
   
+  // This writes the X or O to the board array. 
   futureState.board[position] = state.currentPlayer;
 
-  // Check if there is a winner, not if there is a null
+  // Check if there is a winner. Maybe check for draw after this?
   if(getWinner(state) != null) {
     throw new Error('Game is already over');
   }
@@ -98,10 +95,12 @@ export function makeMove(state: GameState, position: number): GameState {
   } else {
     futureState.currentPlayer = "X";
   }
-    
+ 
   return futureState;
 }
 
+
+// Create an initial blank game
 let currentGame: GameState = createGame();
 
 
@@ -122,5 +121,9 @@ app.post("/reset", (_req,res) => {
 });
 
 app.get("/game", (_req,res) => res.json({currentGame, winner: getWinner(currentGame), draw: checkDraw(currentGame) }));
+
+app.get("/games",(_req,res)=>{
+  return res.json({games: "List of games"})
+});
 
 ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"))
