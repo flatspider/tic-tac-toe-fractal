@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { type Cell, type GameState } from "./tic-tac-toe";
 import "./styling/grid.css";
+import Lobby from "./components/Lobby";
+import TicTacToeBoard from "./components/TicTacToeBoard";
 
 function App() {
   // This is the server gameState
@@ -111,6 +113,8 @@ function App() {
   return (
     <>
       <div className="app">
+        <Lobby />
+        <TicTacToeBoard />
         {loading ? (
           <div>Loading...</div>
         ) : (
