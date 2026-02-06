@@ -5,22 +5,17 @@ import Lobby from "./components/Lobby";
 import TicTacToeBoard from "./components/TicTacToeBoard";
 
 function App() {
-  // This is the server gameState
   const [gameState, setGameState] = useState<null | GameState>(null); //Set this on the client side...?
   const [loading, setLoading] = useState(true);
   const [_error, setError] = useState(null);
-
   const [winner, setWinner] = useState(false);
   const [draw, setDraw] = useState(false);
-
   const [currentGameID, setCurrentGameID] = useState<string>("");
-
   const [currentView, setCurrentView] = useState<string>("lobby");
-
   const [listOfGames, setListOfGames] = useState<string[]>([]);
 
-  //const winner = false; //getWinner(gameState);
-  //const draw = false; //checkDraw(gameState);
+  // Websocket:
+  const wsRef = useRef<WebSocket | null>(null);
 
   const resetGameClick = () => {
     fetch("/reset", {
@@ -49,13 +44,6 @@ function App() {
   };
 
   const makeMoveToServer = (cellID: number) => {
-    // Hit move endpoint with position
-
-    // Let's construct the post request
-    //const url: URL = new URL("/move");
-
-    console.log("BEING CLICKED", cellID);
-
     //So now, we need to send this information to the websocket:
     if (wsRef.current != null && wsRef.current.readyState === WebSocket.OPEN) {
       console.log("NOT NULL");
@@ -63,8 +51,6 @@ function App() {
     }
   };
 
-  // Do I need to go to a new game? Or just get one?
-  // How do I go to a game with ID?
   const createsNewGame = () => {
     fetch("/create", {
       method: "POST",
@@ -95,50 +81,39 @@ function App() {
       });
   };
 
-  const wsRef = useRef<WebSocket | null>(null);
-
   const opensLiveGame = (targetGameID: string) => {
-    /*
-    wsRef.current = new WebSocket(
-      `ws://localhost:3000/game/${targetGameID}/ws`,
-    );
-    */
-
     // Deployed websocket URL:
     wsRef.current = new WebSocket(
       `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/game/${targetGameID}/ws`,
     );
 
-    //const wsCurrent = wsRef.current;
-
-    //Open the websocket
+    //Open the websocket. This lives on the page
     wsRef.current.onopen = () => {
       console.log("ws opened");
     };
     wsRef.current.onclose = () => console.log("ws closed");
 
-    //wsRef.current.onmessage = (event) => console.log("ws msg", event.data);
+    // This is only for ws connection errors
     wsRef.current.onerror = (e) => console.log("ws errer", e);
 
+    //Sets the response when a message comes from the server via ws
     wsRef.current.onmessage = (rawjson) => {
       let json = JSON.parse(rawjson.data);
+      // Do not crash the server. Manage your error:
       if (json.error) {
         console.error(json.error);
         return;
       }
-      console.log(json);
       setCurrentGameID(json.gameID);
       setGameState(json.gameState);
       setWinner(json.winner);
       setDraw(json.draw);
-      // Not sure if necessary to set the gameID every move.
-      // Added to look for winner or draw
       setLoading(false);
     };
-
     setCurrentView("game-view");
   };
 
+  // Load current games for lobby buttons
   useEffect(() => {
     fetch("/games")
       .then((response) => {
