@@ -121,6 +121,7 @@ function App() {
     // And get the gameState for that particular board.
     // And then change the view to game-view
     const url: URL = new URL(`http://localhost:3000/game/${targetGameID}`);
+    //wsRef.current = new WebSocket("ws://localhost:3000/websocket");
 
     fetch(url, {
       method: "GET",
@@ -161,6 +162,8 @@ function App() {
 
     // Use unsecure websocket
     wsRef.current = new WebSocket("ws://localhost:3000/websocket");
+    // This send is always a string in websocket
+    wsRef.current.send("hello");
     wsRef.current.onopen = () => console.log("ws opened");
     wsRef.current.onclose = () => console.log("ws closed");
 

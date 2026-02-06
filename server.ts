@@ -1,9 +1,10 @@
 import express from "express";
 import ViteExpress from "vite-express";
 import expressWs from "express-ws";
+import WebSocket from 'ws';
 //import cors from "cors";
 
-const PORT = 3000;
+const PORT = process.env.port || 3000;
 
 
 const app = express();
@@ -38,7 +39,8 @@ export type GameList = Map<string, GameState>;
 
 let gameCollection: GameList = new Map();
 
- 
+
+
 
 //Creating a game with a random ID
 export function createGame(): GameState {
@@ -181,7 +183,7 @@ app.get("/games",(_req,res)=>{
 app.post("/game/:ID/:ws", (req,res)=>{
   // take in the query parameters from the url
   let targetID = req.params.ID;
-  let webSocket = req.params.ws;
+  //let webSocket = req.params.ws;
 
   // Add game ID and ws id to the set
 
@@ -199,6 +201,38 @@ wsApplication.app.ws('/websocket', function(ws, req) {
   ws.on('message', function(msg) {
     console.log(msg);
   });
+  console.log('socket', req.headers);
+});
+
+
+// I want a set of games...so that new ones are attached to the same websocket
+let gameBroadcasts = new Map<string, Set<WebSocket>>();
+
+wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
+  let targetID = req.params.ID as string;
+  let targetWebSocket = ws;
+
+  if(!gameBroadcasts.has(targetID)){
+    gameBroadcasts.set(targetID, new Set());
+    gameBroadcasts.get(targetID)?.add(targetWebSocket);
+  } else {
+        gameBroadcasts.get(targetID)?.add(targetWebSocket)
+  }
+    
+  // How do I know the position? Is that in the body of the websocket request?
+  let targetGame = gameCollection.get(targetID);
+
+  ws.on('message', function(position: number) {
+     if(targetGame != null) {
+      let newGameState = makeMove(targetGame, position);
+      gameCollection.set(targetID,newGameState);
+      let response = {gameState: newGameState, winner: getWinner(newGameState), draw: checkDraw(newGameState), gameID: targetID}
+      //res.status(200).json(response);
+    } else {
+      //res.status(404).json({error: "Game not found"});
+    }
+  });
+
   console.log('socket', req.headers);
 });
 
