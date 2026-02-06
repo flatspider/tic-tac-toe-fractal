@@ -1,13 +1,10 @@
 import express from "express";
+import expressws from "express-ws"
 import ViteExpress from "vite-express";
 //import cors from "cors";
 
 const PORT = 3000;
-
 export const app = express();
-
-// No cors needed when all requests are coming from the same port
-//app.use(cors());
 
 app.use(express.json());
 
