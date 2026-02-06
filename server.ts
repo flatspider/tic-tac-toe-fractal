@@ -1,4 +1,3 @@
-import type { UUID } from "crypto";
 import express from "express";
 import ViteExpress from "vite-express";
 //import cors from "cors";
