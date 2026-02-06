@@ -20,13 +20,14 @@ body {
 }
 
 .game-play {
-  width: fit-content;
+  display: grid;
+  justify-items: center;
 }
 
 /* Display in a grid. Three auto columns sorts the nine boxes.  */
 /* Place-items is shorthand for align-items and justify-items */
 .container {
-  display: grid;
+  display: inline-grid;
   grid-template-columns: auto auto auto;
   font-size: 5em;
   place-items: center;
@@ -90,6 +91,7 @@ button {
     sans-serif;
 }
 
+/* Ideally these buttons would be in a container and display: flexed */
 .game-button {
   font-size: 2em;
   margin: 10px;

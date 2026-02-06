@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { type Cell, type GameState } from "./tic-tac-toe";
+import { type GameState } from "./tic-tac-toe";
 import "./styling/grid.css";
 import Lobby from "./components/Lobby";
 import TicTacToeBoard from "./components/TicTacToeBoard";
