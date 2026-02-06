@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type GameState } from "./tic-tac-toe";
 import "./styling/grid.css";
 import Lobby from "./components/Lobby";
@@ -53,36 +53,15 @@ function App() {
     // Hit move endpoint with position
 
     // Let's construct the post request
-    const url: URL = new URL("http://localhost:3000/move");
+    //const url: URL = new URL("http://localhost:3000/move");
 
-    fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ position: cellID, gameID: currentGameID }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to get game state`);
-        } else {
-          return response.json();
-        }
-      })
-      .then((json) => {
-        setGameState(json.gameState);
-        setWinner(json.winner);
-        setDraw(json.draw);
-        // Not sure if necessary to set the gameID every move.
-        setCurrentGameID(json.gameID);
-        // Added to look for winner or draw
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
+    console.log("BEING CLICKED", cellID);
+
+    //So now, we need to send this information to the websocket:
+    if (wsRef.current != null && wsRef.current.readyState === WebSocket.OPEN) {
+      console.log("NOT NULL");
+      wsRef.current.send(JSON.stringify({ position: cellID }));
+    }
   };
 
   // Do I need to go to a new game? Or just get one?
@@ -109,6 +88,7 @@ function App() {
         setCurrentGameID(json.gameID);
         setCurrentView("game-view");
         setLoading(false);
+        opensLiveGame(json.gameID);
       })
       .catch((err) => {
         setError(err);
@@ -116,40 +96,37 @@ function App() {
       });
   };
 
-  const opensLiveGame = (targetGameID: string) => {
-    // When clicked by button in the lobby, this needs to take the game id from the list
-    // And get the gameState for that particular board.
-    // And then change the view to game-view
-    const url: URL = new URL(`http://localhost:3000/game/${targetGameID}`);
+  const wsRef = useRef<WebSocket | null>(null);
 
-    fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to get game state`);
-        } else {
-          return response.json();
-        }
-      })
-      .then((json) => {
-        setCurrentGameID(json.gameID);
-        setGameState(json.gameState);
-        setWinner(json.winner);
-        setDraw(json.draw);
-        setCurrentView("game-view");
-        // Not sure if necessary to set the gameID every move.
-        // Added to look for winner or draw
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
+  const opensLiveGame = (targetGameID: string) => {
+    wsRef.current = new WebSocket(
+      `ws://localhost:3000/game/${targetGameID}/ws`,
+    );
+
+    //const wsCurrent = wsRef.current;
+
+    //Open the websocket
+    wsRef.current.onopen = () => {
+      console.log("ws opened");
+    };
+    wsRef.current.onclose = () => console.log("ws closed");
+
+    //wsRef.current.onmessage = (event) => console.log("ws msg", event.data);
+    wsRef.current.onerror = (e) => console.log("ws errer", e);
+
+    wsRef.current.onmessage = (rawjson) => {
+      let json = JSON.parse(rawjson.data);
+      console.log(json);
+      setCurrentGameID(json.gameID);
+      setGameState(json.gameState);
+      setWinner(json.winner);
+      setDraw(json.draw);
+      // Not sure if necessary to set the gameID every move.
+      // Added to look for winner or draw
+      setLoading(false);
+    };
+
+    setCurrentView("game-view");
   };
 
   useEffect(() => {
@@ -208,6 +185,7 @@ function App() {
                 <button
                   onClick={() => {
                     setCurrentView("lobby");
+                    wsRef.current?.close();
                     fetch("http://localhost:3000/games")
                       .then((response) => {
                         if (!response.ok) {
