@@ -55,6 +55,10 @@ function App() {
     // Let's construct the post request
     const url: URL = new URL("http://localhost:3000/move");
 
+    //So now, we need to send this information to the websocket:
+
+    //wsRef.current.send()
+
     fetch(url, {
       method: "POST",
       headers: {
@@ -116,44 +120,41 @@ function App() {
       });
   };
 
-  const opensLiveGame = (targetGameID: string) => {
-    // When clicked by button in the lobby, this needs to take the game id from the list
-    // And get the gameState for that particular board.
-    // And then change the view to game-view
-    const url: URL = new URL(`http://localhost:3000/game/${targetGameID}`);
-    //wsRef.current = new WebSocket("ws://localhost:3000/websocket");
+  const wsRef = useRef<WebSocket | null>(null);
 
-    fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to get game state`);
-        } else {
-          return response.json();
-        }
-      })
-      .then((json) => {
-        setCurrentGameID(json.gameID);
-        setGameState(json.gameState);
-        setWinner(json.winner);
-        setDraw(json.draw);
-        setCurrentView("game-view");
-        // Not sure if necessary to set the gameID every move.
-        // Added to look for winner or draw
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
+  const opensLiveGame = (targetGameID: string) => {
+    wsRef.current = new WebSocket(
+      `ws://localhost:3000/game/${targetGameID}/ws`,
+    );
+
+    //const wsCurrent = wsRef.current;
+
+    //Open the websocket
+    wsRef.current.onopen = () => {
+      console.log("ws opened");
+    };
+    wsRef.current.onclose = () => console.log("ws closed");
+
+    //wsRef.current.onmessage = (event) => console.log("ws msg", event.data);
+    wsRef.current.onerror = (e) => console.log("ws errer", e);
+
+    wsRef.current.onmessage = (rawjson) => {
+      let json = JSON.parse(rawjson.data);
+      console.log(json);
+      setCurrentGameID(json.gameID);
+      setGameState(json.gameState);
+      setWinner(json.winner);
+      setDraw(json.draw);
+      setCurrentView("game-view");
+      // Not sure if necessary to set the gameID every move.
+      // Added to look for winner or draw
+      setLoading(false);
+    };
   };
 
-  const wsRef = useRef<WebSocket | null>(null);
+  // Maybe call this when the gameID shifts?
+
+  /*
   useEffect(() => {
     // Test of websocket on server
     // Hit the wss://url
@@ -163,7 +164,7 @@ function App() {
     // Use unsecure websocket
     wsRef.current = new WebSocket("ws://localhost:3000/websocket");
     // This send is always a string in websocket
-    wsRef.current.send("hello");
+
     wsRef.current.onopen = () => console.log("ws opened");
     wsRef.current.onclose = () => console.log("ws closed");
 
@@ -173,6 +174,7 @@ function App() {
       wsCurrent.close();
     };
   }, []);
+  */
 
   useEffect(() => {
     fetch("http://localhost:3000/games")

@@ -179,8 +179,8 @@ app.get("/games",(_req,res)=>{
   res.json(gamesArray);
 });
 
-// I'm not sure if this is the proper approach. Should I be getting the game ID somewhere else?
-app.post("/game/:ID/:ws", (req,res)=>{
+/* Switching to websocket management
+app.post("/game/:ID/", (req,res)=>{
   // take in the query parameters from the url
   let targetID = req.params.ID;
   //let webSocket = req.params.ws;
@@ -196,6 +196,7 @@ app.post("/game/:ID/:ws", (req,res)=>{
     res.status(400).json({error: "No game found"});
   }
 })
+  */
 
 wsApplication.app.ws('/websocket', function(ws, req) {
   ws.on('message', function(msg) {
@@ -219,14 +220,22 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
         gameBroadcasts.get(targetID)?.add(targetWebSocket)
   }
     
-  // How do I know the position? Is that in the body of the websocket request?
+  // This should be the current gamestate
   let targetGame = gameCollection.get(targetID);
 
+  //Just send over the initial state
+  if(targetGame != null) {
+    ws.send(JSON.stringify({gameState: targetGame, winner: getWinner(targetGame), draw: checkDraw(targetGame), gameID: targetID}))
+  }
+  
   ws.on('message', function(position: number) {
      if(targetGame != null) {
       let newGameState = makeMove(targetGame, position);
       gameCollection.set(targetID,newGameState);
       let response = {gameState: newGameState, winner: getWinner(newGameState), draw: checkDraw(newGameState), gameID: targetID}
+      
+      // And I need to send to all websockets from the targetID
+      ws.send(JSON.stringify(response));
       //res.status(200).json(response);
     } else {
       //res.status(404).json({error: "Game not found"});
