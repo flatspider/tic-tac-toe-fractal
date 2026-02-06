@@ -232,6 +232,7 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
   }
   
   ws.on('message', function(position) {
+    targetGame = gameCollection.get(targetID);
     //It's coming in as a string. 
     //Use toString
     //Then convert it into a json
@@ -240,7 +241,7 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
      if(targetGame != null && setOfWebSockets) {
       // I need to pull out the position
       let newGameState = makeMove(targetGame, positionJSON.position);
-      gameCollection.set(targetID,newGameState);
+      gameCollection.set(targetID, newGameState);
       let response = {gameState: newGameState, winner: getWinner(newGameState), draw: checkDraw(newGameState), gameID: targetID}
       
       //Broadcast gamestate to all websockets
