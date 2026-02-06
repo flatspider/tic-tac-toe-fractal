@@ -160,7 +160,9 @@ app.post("/reset", (req,res) => {
 app.get("/game/:ID", (req,res) => {
   // take in the req.body
   let targetID = req.params.ID;
+  console.log(targetID);
   let targetGame = gameCollection.get(targetID);
+  console.log("Here is the game collection",gameCollection);
 
   if(targetGame != null) {
     // Do I not need to send back the ID?
