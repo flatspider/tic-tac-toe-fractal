@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type GameState } from "./tic-tac-toe";
 import "./styling/grid.css";
 import Lobby from "./components/Lobby";
@@ -151,6 +151,25 @@ function App() {
         setLoading(false);
       });
   };
+
+  const wsRef = useRef<WebSocket | null>(null);
+  useEffect(() => {
+    // Test of websocket on server
+    // Hit the wss://url
+    // Open the connection
+    // Log the response
+
+    // Use unsecure websocket
+    wsRef.current = new WebSocket("ws://localhost:3000/websocket");
+    wsRef.current.onopen = () => console.log("ws opened");
+    wsRef.current.onclose = () => console.log("ws closed");
+
+    const wsCurrent = wsRef.current;
+
+    return () => {
+      wsCurrent.close();
+    };
+  }, []);
 
   useEffect(() => {
     fetch("http://localhost:3000/games")

@@ -1,12 +1,18 @@
 import express from "express";
-import expressws from "express-ws"
 import ViteExpress from "vite-express";
+import expressWs from "express-ws";
 //import cors from "cors";
 
 const PORT = 3000;
-export const app = express();
+
+
+const app = express();
+const wsApplication = expressWs(app);
+
 
 app.use(express.json());
+//var expressWs = require('express-ws')(app);
+expressWs(app);
 
 export type Player = "X" | "O";
 export type Cell = Player | null;
@@ -29,7 +35,10 @@ export type GameState = {
 
 export type GameList = Map<string, GameState>;
 
+
 let gameCollection: GameList = new Map();
+
+ 
 
 //Creating a game with a random ID
 export function createGame(): GameState {
@@ -39,7 +48,6 @@ export function createGame(): GameState {
   };
 }
 
-// Does this need to have an ID attached to it? I feel like no. Not how it should be used. 
 export function getWinner(state: GameState): Player | null {
    
   let winArray = [
@@ -66,7 +74,6 @@ export function checkDraw(state: GameState): Boolean {
     }
   }
 
-// I think there will need to be a new input argument for game ID.
 export function makeMove(state: GameState, position: number): GameState {
   
   // Create copy of state to directly modify
@@ -104,7 +111,6 @@ export function makeMove(state: GameState, position: number): GameState {
 
 app.post("/create", (_req,res) => {
   // Create an initial blank game
-  // Does this need to be added to our list of games? Yes.
   let newGame: GameState = createGame();
   let newGameID = crypto.randomUUID();
   gameCollection.set(newGameID,newGame);
@@ -119,7 +125,6 @@ app.post("/create", (_req,res) => {
 });
 
 // Move, post endpoint. IN: Cell ID. OUT: Current game state
-// Maybe ID should be in query params
 app.post("/move", (req,res) => {
     let position = req.body.position;
     let gameID = req.body.gameID;
@@ -151,17 +156,13 @@ app.post("/reset", (req,res) => {
     }
 });
 
-// TO-DO: Get which game? Will need gameID to be input.
-// Input: just the UUID. Then look it up in the map
 app.get("/game/:ID", (req,res) => {
-  // take in the req.body
+  // take in the query parameters from the url
   let targetID = req.params.ID;
   console.log(targetID);
   let targetGame = gameCollection.get(targetID);
-  console.log("Here is the game collection",gameCollection);
 
   if(targetGame != null) {
-    // Do I not need to send back the ID?
     res.json({gameState: targetGame, winner: getWinner(targetGame), draw: checkDraw(targetGame), gameID: targetID});
   } else {
     res.status(400).json({error: "No game found"});
@@ -174,6 +175,31 @@ app.get("/games",(_req,res)=>{
   let gamesArray = Array.from(games);
   // Return the list of keys for the map
   res.json(gamesArray);
+});
+
+// I'm not sure if this is the proper approach. Should I be getting the game ID somewhere else?
+app.post("/game/:ID/:ws", (req,res)=>{
+  // take in the query parameters from the url
+  let targetID = req.params.ID;
+  let webSocket = req.params.ws;
+
+  // Add game ID and ws id to the set
+
+  console.log(targetID);
+  let targetGame = gameCollection.get(targetID);
+
+  if(targetGame != null) {
+    res.json({gameState: targetGame, winner: getWinner(targetGame), draw: checkDraw(targetGame), gameID: targetID});
+  } else {
+    res.status(400).json({error: "No game found"});
+  }
+})
+
+wsApplication.app.ws('/websocket', function(ws, req) {
+  ws.on('message', function(msg) {
+    console.log(msg);
+  });
+  console.log('socket', req.headers);
 });
 
 ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"));
