@@ -19,7 +19,7 @@ const Lobby = (props: {
         Start a new game
       </button>
       <div className="games-container">
-        {props.listOfGames?.map((element: string) => (
+        {props.listOfGames?.map((element: string, id: number) => (
           <button
             key={element}
             className="game-button"
@@ -27,7 +27,7 @@ const Lobby = (props: {
               props.opensLiveGame(element);
             }}
           >
-            {element ?? " "}
+            {`Game #${id + 1}`}
           </button>
         ))}
       </div>
