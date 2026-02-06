@@ -4,7 +4,7 @@ import expressWs from "express-ws";
 import WebSocket from 'ws';
 //import cors from "cors";
 
-const PORT = Number(process.env.port) || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 
 const app = express();
