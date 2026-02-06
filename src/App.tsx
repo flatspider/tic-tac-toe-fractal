@@ -106,7 +106,7 @@ function App() {
 
     // Deployed websocket URL:
     wsRef.current = new WebSocket(
-      `ws://${window.location.host}/game/${targetGameID}/ws`,
+      `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/game/${targetGameID}/ws`,
     );
 
     //const wsCurrent = wsRef.current;
