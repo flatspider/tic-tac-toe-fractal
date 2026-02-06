@@ -19,6 +19,10 @@ body {
   background-color: #6ded8a;
 }
 
+.game-play {
+  width: fit-content;
+}
+
 /* Display in a grid. Three auto columns sorts the nine boxes.  */
 /* Place-items is shorthand for align-items and justify-items */
 .container {
@@ -84,6 +88,11 @@ button {
     Arial,
     Helvetica,
     sans-serif;
+}
+
+.game-button {
+  font-size: 2em;
+  margin: 10px;
 }
 
 /* Color palette from https://www.color-hex.com/color-palette/109374 */

@@ -117,7 +117,7 @@ app.post("/create", (_req,res) => {
     gameState: newGame,
     gameID: newGameID,
   }
-
+  
   res.status(201).json(response);
 
 });
@@ -140,7 +140,7 @@ app.post("/move", (req,res) => {
     
 });
 
-// Reset the game. TO-DO: Which game? Going to need to input gameID
+// Reset the game. 
 app.post("/reset", (req,res) => {
     // update currentGame
     let targetGameID = req.body.gameID;
@@ -160,7 +160,9 @@ app.post("/reset", (req,res) => {
 app.get("/game/:ID", (req,res) => {
   // take in the req.body
   let targetID = req.params.ID;
+  console.log(targetID);
   let targetGame = gameCollection.get(targetID);
+  console.log("Here is the game collection",gameCollection);
 
   if(targetGame != null) {
     // Do I not need to send back the ID?
