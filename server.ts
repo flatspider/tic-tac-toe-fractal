@@ -238,7 +238,8 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
     //Then convert it into a json
     let stringPosition = position.toString();
      let positionJSON = JSON.parse(stringPosition);
-     if(targetGame != null && setOfWebSockets) {
+
+try {   if(targetGame != null && setOfWebSockets) {
       // I need to pull out the position
       let newGameState = makeMove(targetGame, positionJSON.position);
       gameCollection.set(targetID, newGameState);
@@ -248,10 +249,17 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
       for(const aWebSocket of setOfWebSockets) {
         aWebSocket.send(JSON.stringify(response));
       }
-      //res.status(200).json(response);
-    } else {
-      //res.status(404).json({error: "Game not found"});
-    }
+
+
+    } 
+  } catch(error) {
+      ws.send(JSON.stringify({error: (error as Error).message}))
+  }
+
+  
+
+
+
   });
 
   console.log('socket', req.headers);

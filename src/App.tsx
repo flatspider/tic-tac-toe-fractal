@@ -23,8 +23,7 @@ function App() {
   //const draw = false; //checkDraw(gameState);
 
   const resetGameClick = () => {
-    const url: URL = new URL("http://localhost:3000/reset");
-    fetch(url, {
+    fetch("/reset", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -53,7 +52,7 @@ function App() {
     // Hit move endpoint with position
 
     // Let's construct the post request
-    //const url: URL = new URL("http://localhost:3000/move");
+    //const url: URL = new URL("/move");
 
     console.log("BEING CLICKED", cellID);
 
@@ -67,7 +66,7 @@ function App() {
   // Do I need to go to a new game? Or just get one?
   // How do I go to a game with ID?
   const createsNewGame = () => {
-    fetch("http://localhost:3000/create", {
+    fetch("/create", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -99,8 +98,15 @@ function App() {
   const wsRef = useRef<WebSocket | null>(null);
 
   const opensLiveGame = (targetGameID: string) => {
+    /*
     wsRef.current = new WebSocket(
       `ws://localhost:3000/game/${targetGameID}/ws`,
+    );
+    */
+
+    // Deployed websocket URL:
+    wsRef.current = new WebSocket(
+      `ws://${window.location.host}/game/${targetGameID}/ws`,
     );
 
     //const wsCurrent = wsRef.current;
@@ -116,6 +122,10 @@ function App() {
 
     wsRef.current.onmessage = (rawjson) => {
       let json = JSON.parse(rawjson.data);
+      if (json.error) {
+        console.error(json.error);
+        return;
+      }
       console.log(json);
       setCurrentGameID(json.gameID);
       setGameState(json.gameState);
@@ -130,7 +140,7 @@ function App() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:3000/games")
+    fetch("/games")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch`);
@@ -186,7 +196,7 @@ function App() {
                   onClick={() => {
                     setCurrentView("lobby");
                     wsRef.current?.close();
-                    fetch("http://localhost:3000/games")
+                    fetch("/games")
                       .then((response) => {
                         if (!response.ok) {
                           throw new Error(`Failed to fetch`);
