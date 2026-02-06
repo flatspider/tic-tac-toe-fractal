@@ -40,8 +40,6 @@ export type GameList = Map<string, GameState>;
 let gameCollection: GameList = new Map();
 
 
-
-
 //Creating a game with a random ID
 export function createGame(): GameState {
   return {
@@ -127,6 +125,7 @@ app.post("/create", (_req,res) => {
 });
 
 // Move, post endpoint. IN: Cell ID. OUT: Current game state
+/*
 app.post("/move", (req,res) => {
     let position = req.body.position;
     let gameID = req.body.gameID;
@@ -142,6 +141,7 @@ app.post("/move", (req,res) => {
     }
     
 });
+*/
 
 // Reset the game. 
 app.post("/reset", (req,res) => {
@@ -222,20 +222,31 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
     
   // This should be the current gamestate
   let targetGame = gameCollection.get(targetID);
+  let setOfWebSockets = gameBroadcasts.get(targetID);
 
-  //Just send over the initial state
-  if(targetGame != null) {
-    ws.send(JSON.stringify({gameState: targetGame, winner: getWinner(targetGame), draw: checkDraw(targetGame), gameID: targetID}))
+  //Broadcast to all websockets contained in the target
+  if(targetGame != null && setOfWebSockets) {
+    for(const aWebSocket of setOfWebSockets){
+    aWebSocket.send(JSON.stringify({gameState: targetGame, winner: getWinner(targetGame), draw: checkDraw(targetGame), gameID: targetID}))
+    }
   }
   
-  ws.on('message', function(position: number) {
-     if(targetGame != null) {
-      let newGameState = makeMove(targetGame, position);
+  ws.on('message', function(position) {
+    //It's coming in as a string. 
+    //Use toString
+    //Then convert it into a json
+    let stringPosition = position.toString();
+     let positionJSON = JSON.parse(stringPosition);
+     if(targetGame != null && setOfWebSockets) {
+      // I need to pull out the position
+      let newGameState = makeMove(targetGame, positionJSON.position);
       gameCollection.set(targetID,newGameState);
       let response = {gameState: newGameState, winner: getWinner(newGameState), draw: checkDraw(newGameState), gameID: targetID}
       
-      // And I need to send to all websockets from the targetID
-      ws.send(JSON.stringify(response));
+      //Broadcast gamestate to all websockets
+      for(const aWebSocket of setOfWebSockets) {
+        aWebSocket.send(JSON.stringify(response));
+      }
       //res.status(200).json(response);
     } else {
       //res.status(404).json({error: "Game not found"});

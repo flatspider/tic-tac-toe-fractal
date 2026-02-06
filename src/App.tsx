@@ -53,40 +53,15 @@ function App() {
     // Hit move endpoint with position
 
     // Let's construct the post request
-    const url: URL = new URL("http://localhost:3000/move");
+    //const url: URL = new URL("http://localhost:3000/move");
+
+    console.log("BEING CLICKED", cellID);
 
     //So now, we need to send this information to the websocket:
-
-    //wsRef.current.send()
-
-    fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ position: cellID, gameID: currentGameID }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to get game state`);
-        } else {
-          return response.json();
-        }
-      })
-      .then((json) => {
-        setGameState(json.gameState);
-        setWinner(json.winner);
-        setDraw(json.draw);
-        // Not sure if necessary to set the gameID every move.
-        setCurrentGameID(json.gameID);
-        // Added to look for winner or draw
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
+    if (wsRef.current != null && wsRef.current.readyState === WebSocket.OPEN) {
+      console.log("NOT NULL");
+      wsRef.current.send(JSON.stringify({ position: cellID }));
+    }
   };
 
   // Do I need to go to a new game? Or just get one?
@@ -113,6 +88,7 @@ function App() {
         setCurrentGameID(json.gameID);
         setCurrentView("game-view");
         setLoading(false);
+        opensLiveGame(json.gameID);
       })
       .catch((err) => {
         setError(err);
@@ -145,36 +121,13 @@ function App() {
       setGameState(json.gameState);
       setWinner(json.winner);
       setDraw(json.draw);
-      setCurrentView("game-view");
       // Not sure if necessary to set the gameID every move.
       // Added to look for winner or draw
       setLoading(false);
     };
+
+    setCurrentView("game-view");
   };
-
-  // Maybe call this when the gameID shifts?
-
-  /*
-  useEffect(() => {
-    // Test of websocket on server
-    // Hit the wss://url
-    // Open the connection
-    // Log the response
-
-    // Use unsecure websocket
-    wsRef.current = new WebSocket("ws://localhost:3000/websocket");
-    // This send is always a string in websocket
-
-    wsRef.current.onopen = () => console.log("ws opened");
-    wsRef.current.onclose = () => console.log("ws closed");
-
-    const wsCurrent = wsRef.current;
-
-    return () => {
-      wsCurrent.close();
-    };
-  }, []);
-  */
 
   useEffect(() => {
     fetch("http://localhost:3000/games")
@@ -232,6 +185,7 @@ function App() {
                 <button
                   onClick={() => {
                     setCurrentView("lobby");
+                    wsRef.current?.close();
                     fetch("http://localhost:3000/games")
                       .then((response) => {
                         if (!response.ok) {
