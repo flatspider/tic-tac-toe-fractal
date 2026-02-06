@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { GameState, Cell } from "../tic-tac-toe";
 
 // This requires you to props. to get to the object

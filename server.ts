@@ -4,7 +4,7 @@ import expressWs from "express-ws";
 import WebSocket from 'ws';
 //import cors from "cors";
 
-const PORT = process.env.port || 3000;
+const PORT = Number(process.env.port) || 3000;
 
 
 const app = express();
@@ -77,7 +77,7 @@ export function checkDraw(state: GameState): Boolean {
 export function makeMove(state: GameState, position: number): GameState {
   
   // Create copy of state to directly modify
-  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer, gameID: state.gameID };
+  let futureState: GameState = {board: [...state.board], currentPlayer: state.currentPlayer };
 
   if(position < 0 || position > 8) {
     throw new Error('Position must be between 0 and 8')
