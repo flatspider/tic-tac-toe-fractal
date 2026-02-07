@@ -75,12 +75,17 @@ body {
 
 /* Puts space above the two text items */
 .update-text > div {
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 /* Targets the winner response  */
 .winner-text {
   font-size: 4em;
+}
+
+.reset-buttons {
+  display: flex;
+  margin: 10px;
 }
 
 /* Targets the current */

@@ -184,12 +184,13 @@ function App() {
               <div className="winner-text">
                 {winner ? `Player ${winner} won the game!!` : "NO WINNER YET"}
               </div>
-              <div>
-                {(winner || draw) && (
-                  <button onClick={resetGameClick}>RESET</button>
-                )}
-              </div>
-              <div>
+
+              <div className="reset-buttons">
+                <div>
+                  {(winner || draw) && (
+                    <button onClick={resetGameClick}>RESET</button>
+                  )}
+                </div>
                 <button
                   className="return-lobby-button"
                   onClick={() => {
