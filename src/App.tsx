@@ -38,6 +38,8 @@ function App() {
         })
         .then((json) => {
           setGameState(json.gameState);
+          setWinner(false);
+          setDraw(false);
           setResetting(false);
           setLoading(false);
         })
@@ -187,7 +189,7 @@ function App() {
 
               <div className="reset-buttons">
                 <div>
-                  {(winner || draw) && (
+                  {(winner || draw) && !resetting && (
                     <button onClick={resetGameClick}>RESET</button>
                   )}
                 </div>
