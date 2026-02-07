@@ -8,7 +8,6 @@ const Lobby = (props: {
 }) => {
   return (
     <>
-      <p>You. Are. In. The. Lobby</p>
       <button
         className="new-game-button"
         onClick={() => {
