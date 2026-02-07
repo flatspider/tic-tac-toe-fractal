@@ -112,6 +112,24 @@ function App() {
     setCurrentView("game-view");
   };
 
+  // Dynamic favicon: lobby emoji, ❌ for X's turn, ⭕ for O's turn
+  useEffect(() => {
+    const emoji =
+      currentView === "lobby"
+        ? "🎮"
+        : gameState?.currentPlayer === "X"
+          ? "❌"
+          : "⭕";
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${emoji}</text></svg>`;
+    let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  }, [currentView, gameState?.currentPlayer]);
+
   // Load current games for lobby buttons
   useEffect(() => {
     fetch("/games")

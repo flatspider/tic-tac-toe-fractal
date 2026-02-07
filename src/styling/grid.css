@@ -27,6 +27,7 @@ body {
 }
 
 /* Needed after nesting the container */
+
 .game-play {
   display: grid;
   justify-items: center;
@@ -35,7 +36,7 @@ body {
 /* Display in a grid. Three auto columns sorts the nine boxes.  */
 /* Place-items is shorthand for align-items and justify-items */
 .container {
-  display: inline-grid;
+  display: grid;
   grid-template-columns: auto auto auto;
   font-size: 5em;
   place-items: center;
