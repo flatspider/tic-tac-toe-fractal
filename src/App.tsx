@@ -13,34 +13,40 @@ function App() {
   const [currentGameID, setCurrentGameID] = useState<string>("");
   const [currentView, setCurrentView] = useState<string>("lobby");
   const [listOfGames, setListOfGames] = useState<string[]>([]);
+  const [resetting, setResetting] = useState(false);
 
   // Websocket:
   const wsRef = useRef<WebSocket | null>(null);
 
   const resetGameClick = () => {
-    fetch("/reset", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ gameID: currentGameID }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to get game state`);
-        } else {
-          return response.json();
-        }
+    setResetting(true);
+    setTimeout(() => {
+      fetch("/reset", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ gameID: currentGameID }),
       })
-      .then((json) => {
-        setGameState(json.gameState);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to get game state`);
+          } else {
+            return response.json();
+          }
+        })
+        .then((json) => {
+          setGameState(json.gameState);
+          setResetting(false);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err);
+          setResetting(false);
+          setLoading(false);
+        });
+    }, 500);
   };
 
   const makeMoveToServer = (cellID: number) => {
@@ -112,6 +118,24 @@ function App() {
     setCurrentView("game-view");
   };
 
+  // Dynamic favicon: lobby emoji, ❌ for X's turn, ⭕ for O's turn
+  useEffect(() => {
+    const emoji =
+      currentView === "lobby"
+        ? "🎮"
+        : gameState?.currentPlayer === "X"
+          ? "❌"
+          : "⭕";
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${emoji}</text></svg>`;
+    let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  }, [currentView, gameState?.currentPlayer]);
+
   // Load current games for lobby buttons
   useEffect(() => {
     fetch("/games")
@@ -142,7 +166,7 @@ function App() {
           />
         )}
         {currentView === "game-view" && (
-          <div className="game-play">
+          <div className={`game-play${resetting ? " resetting" : ""}`}>
             {loading && <div>Loading...</div>}
             {!loading && !gameState && <div>Not there</div>}
             {!loading && gameState && (
