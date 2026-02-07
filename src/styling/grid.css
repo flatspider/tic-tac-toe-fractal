@@ -100,6 +100,10 @@ button {
     sans-serif;
 }
 
+.new-game-button {
+  margin-bottom: 10px;
+}
+
 /* Ideally these buttons would be in a container and display: flexed */
 .game-button {
   font-size: 2em;
@@ -125,10 +129,34 @@ button:active {
 
 /* Fade out X's and O's when the board resets */
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
+/* Calls the fadeout class. */
 .resetting .container {
   animation: fadeOut 0.5s ease-out forwards;
+}
+
+/* Scale down text and spacing on mobile so the grid stays on screen */
+@media (max-width: 600px) {
+  .current-player {
+    font-size: 2em;
+  }
+
+  .winner-text {
+    font-size: 1.5em;
+  }
+
+  .update-text > div {
+    margin-top: 15px;
+  }
+
+  button {
+    font-size: 2.5em;
+  }
 }

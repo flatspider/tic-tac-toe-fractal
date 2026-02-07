@@ -10,11 +10,12 @@ const Lobby = (props: {
     <>
       <p>You. Are. In. The. Lobby</p>
       <button
+        className="new-game-button"
         onClick={() => {
           props.createsNewGame();
         }}
       >
-        Start a new game
+        New Game!
       </button>
       <div className="games-container">
         {props.listOfGames?.map((element: string, id: number) => (
