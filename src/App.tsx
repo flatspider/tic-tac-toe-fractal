@@ -46,7 +46,6 @@ function App() {
   const makeMoveToServer = (cellID: number) => {
     //So now, we need to send this information to the websocket:
     if (wsRef.current != null && wsRef.current.readyState === WebSocket.OPEN) {
-      console.log("NOT NULL");
       wsRef.current.send(JSON.stringify({ position: cellID }));
     }
   };
@@ -168,6 +167,7 @@ function App() {
               </div>
               <div>
                 <button
+                  className="return-lobby-button"
                   onClick={() => {
                     setCurrentView("lobby");
                     wsRef.current?.close();
@@ -188,7 +188,7 @@ function App() {
                       });
                   }}
                 >
-                  Return to Lobby
+                  LOBBY
                 </button>
               </div>
             </div>

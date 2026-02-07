@@ -19,6 +19,14 @@ body {
   background-color: #6ded8a;
 }
 
+/* Organize the current games */
+.games-container {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 10px;
+}
+
+/* Needed after nesting the container */
 .game-play {
   display: grid;
   justify-items: center;
