@@ -122,3 +122,13 @@ button:active {
 .O-symbol {
   color: #1645f5;
 }
+
+/* Fade out X's and O's when the board resets */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.resetting .container {
+  animation: fadeOut 0.5s ease-out forwards;
+}
