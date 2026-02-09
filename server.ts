@@ -6,14 +6,14 @@ import WebSocket from 'ws';
 
 const PORT = Number(process.env.PORT) || 3000;
 
-
+// Define the express application.
 const app = express();
+
+// Now, wrap the app. Mutate app directly by expressWs(app).
+// So now you have wsApplication. Use wsApplication.app.ws();
 const wsApplication = expressWs(app);
 
-
 app.use(express.json());
-//var expressWs = require('express-ws')(app);
-expressWs(app);
 
 export type Player = "X" | "O";
 export type Cell = Player | null;
@@ -213,6 +213,10 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
   let targetID = req.params.ID as string;
   let targetWebSocket = ws;
 
+
+  // If the gameBroadcasts map does not have the game currently in the map
+  // Create a new set. Then add the targetWebSocket to the set that was just created.
+  // If the gameID is already in there (this means that you will be opening another websocket) add it in to the set.
   if(!gameBroadcasts.has(targetID)){
     gameBroadcasts.set(targetID, new Set());
     gameBroadcasts.get(targetID)?.add(targetWebSocket);
@@ -230,6 +234,11 @@ wsApplication.app.ws('/game/:ID/ws', function(ws, req) {
     aWebSocket.send(JSON.stringify({gameState: targetGame, winner: getWinner(targetGame), draw: checkDraw(targetGame), gameID: targetID}))
     }
   }
+
+  ws.on('close', ()=>{
+    //remove the websocket from the set;
+    gameBroadcasts.get(targetID)?.delete(ws);
+  });
   
   ws.on('message', function(position) {
     targetGame = gameCollection.get(targetID);
@@ -262,7 +271,6 @@ try {   if(targetGame != null && setOfWebSockets) {
 
   });
 
-  console.log('socket', req.headers);
 });
 
 ViteExpress.listen(app, PORT, ()=> console.log("Vite server is listening"));
